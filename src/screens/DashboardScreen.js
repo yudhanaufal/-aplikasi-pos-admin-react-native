@@ -82,7 +82,9 @@ export default function DashboardScreen({ navigation }) {
         <MenuButton title="Pembelian" />
 
         <MenuButton title="Member" />
-        <MenuButton title="Return" />
+        <MenuButton title="Return"
+            onPress={() => navigation.navigate('Return')}
+        />
 
         <MenuButton title="SO Parsial" />
         <MenuButton title="SO Full" />

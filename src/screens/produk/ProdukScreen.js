@@ -158,11 +158,11 @@ export default function ProdukScreen({ navigation }) {
         <View style={styles.stockContainer}>
           <View style={[
             styles.stockBadge,
-            { backgroundColor: item.stok > 10 ? '#d1fae5' : '#fee2e2' }
+            { backgroundColor: item.stok > 5 ? '#d1fae5' : '#fee2e2' }
           ]}>
             <Text style={[
               styles.stockText,
-              { color: item.stok > 10 ? '#065f46' : '#991b1b' }
+              { color: item.stok > 5 ? '#065f46' : '#991b1b' }
             ]}>
               Stok: {item.stok}
             </Text>
