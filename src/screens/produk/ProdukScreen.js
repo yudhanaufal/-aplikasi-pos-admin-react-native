@@ -12,8 +12,7 @@ import {
   Alert,
 } from 'react-native';
 import { getUser } from '../../utils/Storage';
-
-const BASE_URL = 'http://10.0.2.2:3000';
+import BASE_URL from '../../utils/Api';
 
 export default function ProdukScreen({ navigation }) {
   const [produk, setProduk] = useState([]);

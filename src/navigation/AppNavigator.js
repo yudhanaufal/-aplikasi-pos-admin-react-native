@@ -6,6 +6,7 @@ import produkScreen from '../screens/produk/ProdukScreen'
 import TambahProdukScreen from '../screens/produk/TambahProdukScreen'
 import DetailProdukScreen from '../screens/produk/DetailProdukScreen'
 import ReturnScreen from '../screens/ReturnScreen'
+import PembelianScreen from '../screens/PembelianScreen'
 const Stack = createNativeStackNavigator();
 
 export default function AppNavigator() {
@@ -17,6 +18,7 @@ export default function AppNavigator() {
       <Stack.Screen name="TambahProduk" component={TambahProdukScreen} />
       <Stack.Screen name="DetailProduk" component={DetailProdukScreen} />
       <Stack.Screen name="Return" component={ReturnScreen} />
+      <Stack.Screen name="Pembelian" component={PembelianScreen} />
 
     </Stack.Navigator>
   );

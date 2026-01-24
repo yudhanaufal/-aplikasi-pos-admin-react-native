@@ -10,8 +10,7 @@ import {
 } from 'react-native';
 
 import { saveUser } from '../utils/Storage';
-
-const BASE_URL = 'http://10.0.2.2:3000';
+import BASE_URL from '../utils/Api';
 
 export default function LoginScreen({ navigation }) {
   const [username, setUsername] = useState('');

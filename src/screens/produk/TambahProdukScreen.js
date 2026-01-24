@@ -12,8 +12,7 @@ import {
 } from 'react-native';
 import { launchImageLibrary } from 'react-native-image-picker';
 import { getUser } from '../../utils/Storage';
-
-const BASE_URL = 'http://10.0.2.2:3000';
+import BASE_URL from '../../utils/Api';
 
 export default function TambahProdukScreen({ navigation }) {
   const [namaProduk, setNamaProduk] = useState('');

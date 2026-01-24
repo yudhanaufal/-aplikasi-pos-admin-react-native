@@ -12,8 +12,7 @@ import {
   Platform,
 } from 'react-native';
 import { launchImageLibrary } from 'react-native-image-picker';
-
-const API_URL = 'http://10.0.2.2:3000';
+import BASE_URL from '../../utils/Api';
 
 export default function DetailProdukScreen({ route, navigation }) {
   const { id } = route.params;
@@ -31,7 +30,7 @@ export default function DetailProdukScreen({ route, navigation }) {
      GET DETAIL PRODUK
   ====================== */
   useEffect(() => {
-    fetch(`${API_URL}/api/produk/${id}`)
+    fetch(`${BASE_URL}/api/produk/${id}`)
       .then(res => res.json())
       .then(json => {
         const data = json.data;
@@ -41,7 +40,7 @@ export default function DetailProdukScreen({ route, navigation }) {
         setHargaBeli(data.harga_beli);
         setHargaJual(data.harga_jual);
         setStok(String(data.stok));
-        setImageUrl(`${API_URL}${data.gambar_url}`);
+        setImageUrl(`${BASE_URL}${data.gambar_url}`);
       })
       .catch(() => {
         Alert.alert('Error', 'Gagal mengambil data produk');
@@ -94,7 +93,7 @@ export default function DetailProdukScreen({ route, navigation }) {
     }
 
     try {
-      const res = await fetch(`${API_URL}/api/produk/${id}`, {
+      const res = await fetch(`${BASE_URL}/api/produk/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'multipart/form-data',
@@ -167,13 +166,13 @@ export default function DetailProdukScreen({ route, navigation }) {
         value={hargaJual}
         onChangeText={setHargaJual}
       />
-
       <TextInput
         style={styles.input}
         placeholder="Stok"
         keyboardType="numeric"
         value={stok}
-        onChangeText={setStok}
+        editable={false}
+        pointerEvents="none"  
       />
 
       <TouchableOpacity
