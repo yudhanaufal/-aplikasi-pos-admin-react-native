@@ -13,8 +13,8 @@ import {
   RefreshControl,
   Image
 } from 'react-native';
-import { getUser } from '../utils/Storage';
-import BASE_URL from '../utils/Api';
+import { getUser } from '../../utils/Storage';
+import BASE_URL from '../../utils/Api';
 
 export default function PembelianScreen() {
   const [produk, setProduk] = useState([]);

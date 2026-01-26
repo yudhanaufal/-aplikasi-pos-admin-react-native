@@ -6,7 +6,11 @@ import produkScreen from '../screens/produk/ProdukScreen'
 import TambahProdukScreen from '../screens/produk/TambahProdukScreen'
 import DetailProdukScreen from '../screens/produk/DetailProdukScreen'
 import ReturnScreen from '../screens/ReturnScreen'
-import PembelianScreen from '../screens/PembelianScreen'
+import PembelianScreen from '../screens/pembelian/PembelianScreen'
+import LaporanPembelian from '../screens/pembelian/LaporanPembelian'
+import DetailPembelian from '../screens/pembelian/DetailPembelian'
+import ListPenjualan from '../screens/penjualan/ListPenjualan'
+import DetailPenjualan from '../screens/penjualan/DetailPenjualan'
 const Stack = createNativeStackNavigator();
 
 export default function AppNavigator() {
@@ -19,6 +23,11 @@ export default function AppNavigator() {
       <Stack.Screen name="DetailProduk" component={DetailProdukScreen} />
       <Stack.Screen name="Return" component={ReturnScreen} />
       <Stack.Screen name="Pembelian" component={PembelianScreen} />
+      <Stack.Screen name="LaporanPembelian" component={LaporanPembelian} />
+      <Stack.Screen name="DetailPembelian" component={DetailPembelian} />
+      <Stack.Screen name="ListPenjualan" component={ListPenjualan} />
+      <Stack.Screen name="DetailPenjualan" component={DetailPenjualan} />
+
 
     </Stack.Navigator>
   );

@@ -69,8 +69,8 @@ export default function DashboardScreen({ navigation }) {
     { id: 4, title: 'Return', icon: '↩️', route: 'Return' },
     // { id: 5, title: 'SO Parsial', icon: '📊', route: null },
     // { id: 6, title: 'SO Full', icon: '📦', route: null },
-    { id: 7, title: 'Laporan Pembelian', icon: '📈', route: null },
-    { id: 8, title: 'Laporan Penjualan', icon: '💰', route: null },
+    { id: 7, title: 'Laporan Pembelian', icon: '📈', route: 'LaporanPembelian' },
+    { id: 8, title: 'Laporan Penjualan', icon: '💰', route: 'ListPenjualan' },
     // { id: 9, title: 'Laporan SO Parsial', icon: '📋', route: null },
     // { id: 10, title: 'Laporan SO Full', icon: '📑', route: null },
   ];
