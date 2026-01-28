@@ -18,6 +18,7 @@ export default function DetailPembelian({ route, navigation }) {
   const [pembelianInfo, setPembelianInfo] = useState(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [cancelling, setCancelling] = useState(false);
 
   // Fungsi format angka ke Rupiah dengan validasi
   const formatRupiah = (angka) => {
@@ -149,6 +150,153 @@ export default function DetailPembelian({ route, navigation }) {
     } finally {
       setLoading(false);
       setRefreshing(false);
+    }
+  };
+
+  // Fungsi batalkanPembelian - PERBAIKAN: Pindah ke dalam komponen
+  const batalkanPembelian = async () => {
+    Alert.alert(
+      'Konfirmasi Pembatalan',
+      `Apakah Anda yakin ingin membatalkan pembelian ini?`,
+      [
+        {
+          text: 'Tidak',
+          style: 'cancel'
+        },
+        {
+          text: 'Ya, Batalkan',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              setCancelling(true);
+              
+              console.log('Membatalkan pembelian ID:', pembelianId);
+              console.log('URL:', `${BASE_URL}/api/pembelian/${pembelianId}/status`);
+              
+              // Coba beberapa endpoint yang mungkin
+              const endpoints = [
+                `${BASE_URL}/api/pembelian/${pembelianId}/status`,
+                `${BASE_URL}/api/pembelian/${pembelianId}/cancel`,
+                `${BASE_URL}/api/pembelian/cancel/${pembelianId}`,
+                `${BASE_URL}/api/pembelian/${pembelianId}`
+              ];
+              
+              let lastError = null;
+              
+              for (const endpoint of endpoints) {
+                try {
+                  console.log('Mencoba endpoint:', endpoint);
+                  
+                  const response = await fetch(endpoint, {
+                    method: 'PUT',
+                    headers: {
+                      'Content-Type': 'application/json',
+                      'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ 
+                      status: 'BATAL',
+                      action: 'cancel'
+                    })
+                  });
+                  
+                  console.log('Response status:', response.status);
+                  
+                  if (response.ok) {
+                    const result = await response.json();
+                    console.log('Response JSON:', result);
+                    
+                    Alert.alert(
+                      'Sukses',
+                      'Pembelian berhasil dibatalkan',
+                      [
+                        {
+                          text: 'OK',
+                          onPress: () => {
+                            // Refresh data setelah pembatalan
+                            fetchDetail();
+                            // atau navigasi kembali
+                            navigation.goBack();
+                          }
+                        }
+                      ]
+                    );
+                    
+                    setCancelling(false);
+                    return; // Berhasil, keluar dari loop
+                  } else {
+                    const errorText = await response.text();
+                    console.log('Error response:', errorText);
+                    lastError = `HTTP ${response.status}: ${errorText}`;
+                  }
+                } catch (err) {
+                  console.log('Error pada endpoint:', endpoint, err);
+                  lastError = err.message;
+                }
+              }
+              
+              // Jika semua endpoint gagal
+              Alert.alert(
+                'Gagal',
+                `Tidak dapat membatalkan pembelian: ${lastError || 'Endpoint tidak ditemukan'}\n\nCoba metode lain:\n1. PATCH ke /cancel\n2. PUT dengan status\n3. Hubungi admin`
+              );
+              
+            } catch (error) {
+              console.log('ERROR BATAL:', error);
+              Alert.alert(
+                'Error Koneksi',
+                `Terjadi kesalahan: ${error.message}\n\nPastikan:\n1. Koneksi internet aktif\n2. Server API berjalan\n3. Endpoint benar`
+              );
+            } finally {
+              setCancelling(false);
+            }
+          }
+        }
+      ],
+      { cancelable: true }
+    );
+  };
+
+  // Alternatif metode cancel dengan PATCH
+  const batalkanDenganPatch = async () => {
+    try {
+      setCancelling(true);
+      
+      const response = await fetch(
+        `${BASE_URL}/api/pembelian/cancel/${pembelianId}`,
+        {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({})
+        }
+      );
+      
+      const result = await response.json();
+      console.log('PATCH Response:', result);
+      
+      if (response.ok) {
+        Alert.alert(
+          'Sukses',
+          'Pembelian berhasil dibatalkan',
+          [
+            {
+              text: 'OK',
+              onPress: () => navigation.goBack()
+            }
+          ]
+        );
+      } else {
+        Alert.alert(
+          'Gagal',
+          result.message || 'Gagal membatalkan pembelian'
+        );
+      }
+    } catch (error) {
+      console.error('PATCH Error:', error);
+      Alert.alert('Error', 'Terjadi kesalahan koneksi');
+    } finally {
+      setCancelling(false);
     }
   };
 
@@ -288,34 +436,10 @@ export default function DetailPembelian({ route, navigation }) {
             </View>
             <View style={styles.headerInfo}>
               <Text style={styles.invoiceText}>{invoice}</Text>
-              {/* <View style={[
-                styles.statusBadge,
-                pembelianInfo?.status === 'BATAL' ? styles.statusBatal :
-                pembelianInfo?.status === 'SELESAI' ? styles.statusSelesai :
-                styles.statusPending
-              ]}>
-                <Text style={styles.statusText}>
-                  {pembelianInfo?.status || 'PROSES'}
-                </Text>
-              </View> */}
             </View>
           </View>
 
           <View style={styles.infoGrid}>
-            {/* <View style={styles.infoItem}>
-              <Text style={styles.infoLabel}>📅 Tanggal</Text>
-              <Text style={styles.infoValue}>
-                {pembelianInfo?.tanggal || pembelianInfo?.created_at || 'N/A'}
-              </Text>
-            </View>
-            
-            <View style={styles.infoItem}>
-              <Text style={styles.infoLabel}>👤 Kasir</Text>
-              <Text style={styles.infoValue}>
-                {pembelianInfo?.user_nama || pembelianInfo?.kasir || 'N/A'}
-              </Text>
-            </View>
-             */}
             <View style={styles.infoItem}>
               <Text style={styles.infoLabel}>📦 Total Item</Text>
               <Text style={styles.infoValue}>{validDetailCount}</Text>
@@ -326,6 +450,29 @@ export default function DetailPembelian({ route, navigation }) {
               <Text style={styles.infoValue}>
                 {formatQuantity(calculateTotalQuantity())}
               </Text>
+            </View>
+
+            <View style={styles.infoItem}>
+              <Text style={styles.infoLabel}>📅 Tanggal</Text>
+              <Text style={styles.infoValue}>
+                {pembelianInfo?.tanggal || pembelianInfo?.created_at || 'N/A'}
+              </Text>
+            </View>
+            
+            <View style={styles.infoItem}>
+              <Text style={styles.infoLabel}>🔴 Status</Text>
+              <View style={[
+                styles.statusBadge,
+                pembelianInfo?.status === 'BATAL' || pembelianInfo?.status === 'CANCELED' 
+                  ? styles.statusBatal :
+                pembelianInfo?.status === 'SELESAI' || pembelianInfo?.status === 'COMPLETED' 
+                  ? styles.statusSelesai :
+                styles.statusPending
+              ]}>
+                <Text style={styles.statusText}>
+                  {pembelianInfo?.status || 'PROSES'}
+                </Text>
+              </View>
             </View>
           </View>
         </View>
@@ -367,77 +514,38 @@ export default function DetailPembelian({ route, navigation }) {
       </ScrollView>
 
       {/* Action Button */}
-      {pembelianInfo?.status !== 'BATAL' && pembelianInfo?.status !== 'DIBATALKAN' && (
+      {pembelianInfo?.status !== 'BATAL' && 
+       pembelianInfo?.status !== 'CANCELED' && 
+       pembelianInfo?.status !== 'DIBATALKAN' && (
         <View style={styles.footer}>
-          <TouchableOpacity
-            onPress={batalkanPembelian}
-            style={styles.batalButton}
-          >
-            <Text style={styles.batalButtonText}>❌ Batalkan Pembelian</Text>
-          </TouchableOpacity>
+          {cancelling ? (
+            <View style={styles.loadingButton}>
+              <ActivityIndicator color="#fff" />
+              <Text style={styles.loadingButtonText}>Memproses...</Text>
+            </View>
+          ) : (
+            <>
+              <TouchableOpacity
+                onPress={batalkanPembelian}
+                style={styles.batalButton}
+              >
+                <Text style={styles.batalButtonText}>❌ Batalkan Pembelian</Text>
+              </TouchableOpacity>
+              
+              {/* Tombol alternatif */}
+              <TouchableOpacity
+                onPress={batalkanDenganPatch}
+                style={styles.altButton}
+              >
+                <Text style={styles.altButtonText}>🔄 Coba Metode Lain</Text>
+              </TouchableOpacity>
+            </>
+          )}
         </View>
       )}
     </View>
   );
 }
-
-// Fungsi batalkanPembelian
-const batalkanPembelian = () => {
-  Alert.alert(
-    'Konfirmasi Pembatalan',
-    `Apakah Anda yakin ingin membatalkan pembelian ini?`,
-    [
-      {
-        text: 'Tidak',
-        style: 'cancel'
-      },
-      {
-        text: 'Ya, Batalkan',
-        style: 'destructive',
-        onPress: async () => {
-          try {
-            const response = await fetch(
-              `${BASE_URL}/api/pembelian/${pembelianId}/status`,
-              {
-                method: 'PUT',
-                headers: {
-                  'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ status: 'BATAL' })
-              }
-            );
-
-            const result = await response.json();
-            console.log('RESPONSE BATAL:', result);
-
-            if (!response.ok) {
-              Alert.alert(
-                'Gagal',
-                result.message || 'Gagal membatalkan pembelian'
-              );
-              return;
-            }
-
-            Alert.alert(
-              'Sukses',
-              'Pembelian berhasil dibatalkan',
-              [
-                {
-                  text: 'OK',
-                  onPress: () => navigation.goBack()
-                }
-              ]
-            );
-          } catch (error) {
-            console.log('ERROR BATAL:', error);
-            Alert.alert('Error', 'Terjadi kesalahan koneksi');
-          }
-        }
-      }
-    ],
-    { cancelable: true }
-  );
-};
 
 const styles = StyleSheet.create({
   container: {
@@ -493,9 +601,16 @@ const styles = StyleSheet.create({
   statusBadge: {
     alignSelf: 'flex-start',
     paddingHorizontal: 12,
-    paddingVertical: 4,
+    paddingVertical: 6,
     borderRadius: 12,
     marginTop: 5,
+  },
+  statusSelesai: {
+    backgroundColor: '#d4edda',
+  },
+  statusText: {
+    fontSize: 11,
+    fontWeight: 'bold',
   },
   statusSelesai: {
     backgroundColor: '#d4edda',
@@ -509,7 +624,6 @@ const styles = StyleSheet.create({
   statusText: {
     fontSize: 11,
     fontWeight: 'bold',
-    color: '#155724',
   },
   infoGrid: {
     flexDirection: 'row',
@@ -523,13 +637,12 @@ const styles = StyleSheet.create({
   infoLabel: {
     fontSize: 12,
     color: '#888',
-    marginTop: 4,
+    marginBottom: 4,
   },
   infoValue: {
     fontSize: 14,
     fontWeight: '600',
     color: '#333',
-    marginTop: 2,
   },
   totalCard: {
     backgroundColor: '#4A90E2',
@@ -717,10 +830,36 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 3,
     elevation: 3,
+    marginBottom: 10,
   },
   batalButtonText: {
     color: '#fff',
     fontSize: 16,
     fontWeight: '600',
+  },
+  altButton: {
+    backgroundColor: '#6c757d',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 12,
+    borderRadius: 8,
+    marginTop: 5,
+  },
+  altButtonText: {
+    color: '#fff',
+    fontSize: 14,
+  },
+  loadingButton: {
+    backgroundColor: '#6c757d',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 16,
+    borderRadius: 10,
+  },
+  loadingButtonText: {
+    color: '#fff',
+    marginLeft: 10,
+    fontSize: 14,
   },
 });
